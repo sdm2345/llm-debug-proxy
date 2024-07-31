@@ -167,6 +167,7 @@ func logToFile(r *http.Request, rec *httptest.ResponseRecorder, model string, re
 			}
 			if v.Message.ToolCalls != nil {
 				res += "tool_calls:\n"
+				v.Message.ToolCalls = formatCall(v.Message.ToolCalls)
 				buf, _ := yaml.Marshal(v.Message.ToolCalls)
 				res += indent("name:", string(buf))
 			}
@@ -195,6 +196,16 @@ func logToFile(r *http.Request, rec *httptest.ResponseRecorder, model string, re
 	if err := os.WriteFile(fullName, []byte(logContent), 0644); err != nil {
 		log.Printf("Failed to write log file: %v", err)
 	}
+}
+
+func formatCall(calls []openai.ToolCall) []openai.ToolCall {
+	for i, item := range calls {
+		args := make(map[string]any)
+		_ = json.Unmarshal([]byte(item.Function.Arguments), &args)
+		out, _ := json.MarshalIndent(args, "", "  ")
+		calls[i].Function.Arguments = string(out)
+	}
+	return calls
 }
 
 type StreamItem struct {
