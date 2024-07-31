@@ -164,13 +164,13 @@ func logToFile(r *http.Request, rec *httptest.ResponseRecorder, model string, re
 				res += "function_call:\n"
 				v.Message.FunctionCall = formatFunctionCall(v.Message.FunctionCall)
 				buf, _ := yaml.Marshal(v.Message.FunctionCall)
-				res += indent("name:", string(buf))
+				res += indent(string(buf), "  ")
 			}
 			if v.Message.ToolCalls != nil {
 				res += "tool_calls:\n"
 				v.Message.ToolCalls = formatCall(v.Message.ToolCalls)
 				buf, _ := yaml.Marshal(v.Message.ToolCalls)
-				res += indent("name:", string(buf))
+				res += indent(string(buf), "  ")
 			}
 		}
 	} else {
