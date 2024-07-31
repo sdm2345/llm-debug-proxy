@@ -162,6 +162,7 @@ func logToFile(r *http.Request, rec *httptest.ResponseRecorder, model string, re
 			res += "content: | \n" + indent(v.Message.Content, "  ") + "\n"
 			if v.Message.FunctionCall != nil {
 				res += "function_call:\n"
+				v.Message.FunctionCall = formatFunctionCall(v.Message.FunctionCall)
 				buf, _ := yaml.Marshal(v.Message.FunctionCall)
 				res += indent("name:", string(buf))
 			}
@@ -206,6 +207,15 @@ func formatCall(calls []openai.ToolCall) []openai.ToolCall {
 		calls[i].Function.Arguments = string(out)
 	}
 	return calls
+}
+func formatFunctionCall(item *openai.FunctionCall) *openai.FunctionCall {
+
+	args := make(map[string]any)
+	_ = json.Unmarshal([]byte(item.Arguments), &args)
+	out, _ := json.MarshalIndent(args, "", "  ")
+	item.Arguments = string(out)
+
+	return item
 }
 
 type StreamItem struct {
