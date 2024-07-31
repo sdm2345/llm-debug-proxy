@@ -203,7 +203,7 @@ func formatCall(calls []openai.ToolCall) []openai.ToolCall {
 	for i, item := range calls {
 		args := make(map[string]any)
 		_ = json.Unmarshal([]byte(item.Function.Arguments), &args)
-		out, _ := json.MarshalIndent(args, "", "  ")
+		out, _ := yaml.Marshal(args)
 		calls[i].Function.Arguments = string(out)
 	}
 	return calls
@@ -212,7 +212,7 @@ func formatFunctionCall(item *openai.FunctionCall) *openai.FunctionCall {
 
 	args := make(map[string]any)
 	_ = json.Unmarshal([]byte(item.Arguments), &args)
-	out, _ := json.MarshalIndent(args, "", "  ")
+	out, _ := yaml.Marshal(args)
 	item.Arguments = string(out)
 
 	return item
