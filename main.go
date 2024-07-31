@@ -6,6 +6,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/sashabaranov/go-openai"
+	"gopkg.in/yaml.v3"
 	"io"
 	"log"
 	"net/http"
@@ -159,6 +160,16 @@ func logToFile(r *http.Request, rec *httptest.ResponseRecorder, model string, re
 		for _, v := range chatRes.Choices {
 			res += "role: " + v.Message.Role + "\n"
 			res += "content: | \n" + indent(v.Message.Content, "  ") + "\n"
+			if v.Message.FunctionCall != nil {
+				res += "function_call:\n"
+				buf, _ := yaml.Marshal(v.Message.FunctionCall)
+				res += indent("name:", string(buf))
+			}
+			if v.Message.ToolCalls != nil {
+				res += "tool_calls:\n"
+				buf, _ := yaml.Marshal(v.Message.ToolCalls)
+				res += indent("name:", string(buf))
+			}
 		}
 	} else {
 		lines := strings.Split(string(responseBody), "\n")
